@@ -1,64 +1,75 @@
-import requests
-from bs4 import BeautifulSoup
-import re
-from googlesearch import search
+#!/usr/bin/env python3
+
+#Import all the required libraries
+import requests , typer , os , time 
+from dotenv import load_dotenv
+#Create a typer object
+app = typer.Typer()
+@app.command()
+#Create a function to get the weather data
+def get_data_current():
+    load_dotenv()
+    #Print the banner
+    banner = """
+██╗    ██╗███████╗ █████╗ ████████╗██╗  ██╗███████╗██████╗
+██║    ██║██╔════╝██╔══██╗╚══██╔══╝██║  ██║██╔════╝██╔══██╗
+██║ █╗ ██║█████╗  ███████║   ██║   ███████║█████╗  ██████╔╝
+██║███╗██║██╔══╝  ██╔══██║   ██║   ██╔══██║██╔══╝  ██╔══██╗
+╚███╔███╔╝███████╗██║  ██║   ██║   ██║  ██║███████╗██║  ██║
+ ╚══╝╚══╝ ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+
+               ██████╗  █████╗ ██╗
+               ██╔══██╗██╔══██╗██║
+               ██████╔╝███████║██║
+               ██╔═══╝ ██╔══██║██║
+               ██║     ██║  ██║███████╗
+               ╚═╝     ╚═╝  ╚═╝╚══════╝
 
 
-def getURL(location):
-    query = "IBM Weather Channel" + location + "Today Weather"
-    for i in search(query,tld="com",stop=1):
-        url = i
-    if "https://weather.com/en-IN/weather/today/l/" in url:
-        return url
-    else: 
-        return -1
+            """
+    print(banner)
+    #Get the location from the user
+    location = input("[+]Enter location:")
+    #Construct the url from base_url and location
+    base_url = "http://api.openweathermap.org/data/2.5/weather?"
+    url = construct_url(location,base_url)
+    #Get the response from the url
+    response = requests.get(url)
+    #Check if the response is valid
+    response = requests.get(url)
+    if response.status_code == 404:
+        print('Error: 404 City not found.')
+    else:
+        try:
+            response.raise_for_status()
+            data = response.json()
+            prettify(data)
+        except requests.exceptions.RequestException as e:
+            print('Error:', e)
+#create a function to cleanup the response from the api
+def prettify(response):
+    print("____LOCATION DATA__________")
+    print(f"Longitude:{response['coord']['lon']} Latitude:{response['coord']['lat']}\n")
+    print(f"Current date is:{time.gmtime(response['dt'])[2]}/{time.gmtime(response['dt'])[1]}/{time.gmtime(response['dt'])[0]}")
+    print(f"The weather condition right now is {response['weather'][0]['main']}\n")
+    print("____WEATHER DATA__________")
+    print("1.Temperature")
+    print(f"\tCurrent Temperature: {response['main']['temp']}"+chr(176)+"C")    
+    print(f"\tFeels Like: {response['main']['feels_like']}"+chr(176)+"C")
+    print(f"\tMinimum Temperature: {response['main']['temp_min']}"+chr(176)+"C")
+    print(f"\tMaximum Temperature: {response['main']['temp_max']}"+chr(176)+"C")
+    print(f"\tCurrent Temperature: {response['main']['temp']}"+chr(176)+"C")
+    print(f"2.Pressure:{response['main']['pressure']} mb")
+    print(f"3.Humidity: {response['main']['humidity']}")
+    print("4.Wind")
+    print(f"\tWind Speed: {response['wind']['speed']} km/h")
+    print(f"\tWind Degree: {response['wind']['deg']}"+chr(176))
+#create a function to construct the url for location
+def construct_url(location,base_url):
+    api_key = os.getenv('api_key')
+    query_parameters = f"q={location}&appid={api_key}&units=metric"
+    complete_url=base_url+query_parameters
+    return complete_url
 
-def get_html(url):
-    html = requests.get(url)
-    htmlContent = html.content
-    return htmlContent
-
-def parseHTML(html):
-    soup = BeautifulSoup(html, features="html.parser")
-    return soup
-
-def get_current_Data(soup):
-    location ="".join(soup.find("header",{"class":"Card--cardHeader--3NRFf"}).h2.get_text().split()[3:])  ## WHY DOES THIS GOVE NONE FOR CHENNAI?????
-    feels_like = soup.find("span",{"class":"TodayDetailsCard--feelsLikeTempValue--2icPt"}).get_text() + "C"
-    wind_direction_num = int(str(soup.find("svg",{"class":"Icon--icon--2aW0V Icon--darkTheme--1PZ-8","name":"wind-direction"}).get_attribute_list("style")).split("rotate(")[1].split("deg")[0])
-    if(wind_direction_num>0 and wind_direction_num<90):
-        wind_direction = "SW"
-    if(wind_direction_num>90 and wind_direction_num<180):
-        wind_direction = "NW"
-    if(wind_direction_num>180 and wind_direction_num<270):
-        wind_direction = "NE"
-    if(wind_direction_num>270 and wind_direction_num<360):
-        wind_direction = "SE"
-    wind_speed_kmh = float(soup.find("span",{"class":"Wind--windWrapper--3Ly7c undefined"}).get_text().split("Direction")[1].split(" ")[0])
-    current_temp = soup.find("span",{"class":"CurrentConditions--tempValue--MHmYY"}).get_text()+"C"
-    condition = soup.find("div",{"class":"CurrentConditions--phraseValue--mZC_p"}).get_text()
-    humidity = soup.find("span",{"data-testid":"PercentageValue"}).get_text()
-    visibility= soup.find("span",{"data-testid":"VisibilityValue"}).get_text()
-    pressure  = soup.find("span",{"data-testid":"PressureValue"}).get_text()
-    
-    
-    conditions = {"Location":location,"Feels like":feels_like,"Wind direction":wind_direction,"Wind Speed":str(wind_speed_kmh)+" kmh","Current Temp":current_temp,"Condition":condition,"Humidity":humidity,"Visibility":visibility,"Pressure":pressure}
-    return conditions
-
-
-def main():
-    location = input("Enter Location:")
-    url = getURL(location)
-    if(url == -1):
-        print("Cannot get URL.Please visit IBM Weather Channel, find the page for today's forecast of your place and enter the url.")
-        url = input("Enter URL:")
-    html = get_html(url)
-    soup = parseHTML(html)
-    conditions = get_current_Data(soup)
-    
-    print("________________CURRENT__________________")
-    for key in conditions:
-        print(key +":"+ str(conditions[key]))
-
-
-main()
+if __name__=="__main__":
+    app()
