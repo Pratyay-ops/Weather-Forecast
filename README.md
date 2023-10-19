@@ -17,6 +17,10 @@ Whether you're planning a picnic, a road trip, or just your daily commute, this 
 # Usage
 
 ## Step 1: Clone the repository
+use this command
+```
+git clone https://github.com/Pratyay-ops/Weather-Forecast.git
+```
 
 ## Step 2: Install all dependencies
 Run the following command from the terminal 
