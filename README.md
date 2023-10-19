@@ -27,7 +27,8 @@ Run the following command from the terminal
 ```
 pip install -r requirements.txt
 ```
-## Step 3. obtain an API key from [WeatherAPI.com](https://www.weatherapi.com/) and paste the API Key in the .env file by going to the folder where repo is located and creating a new text file ".env".
+## Step 3. Obtain an API key from [WeatherAPI.com](https://www.weatherapi.com/) 
+paste the API Key in the .env file by going to the folder where repo is located and creating a new text file ".env".
 ```py
 # .env file
 API_KEY=<your-api-key>
