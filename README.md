@@ -33,6 +33,10 @@ pip install -r requirements.txt
 API_KEY=<your-api-key>
 ```
 ## Step 4: Run WeatherPal.py
-Use the command python3 WeatherPal.py
+Use the command 
+```
+python3 WeatherPal.py
+```
+enter the city name
 ![image](https://github.com/Pratyay-ops/Weather-Forecast/assets/129536170/7a58240e-bf88-4fec-8660-6a200e078774)
 There you go no need to check all the website for multiple data just run the script and have your API do the work for you.
