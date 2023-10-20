@@ -41,3 +41,10 @@ python3 WeatherPal.py
 enter the city name
 ![image](https://github.com/Pratyay-ops/Weather-Forecast/assets/129536170/7a58240e-bf88-4fec-8660-6a200e078774)
 There you go no need to check all the website for multiple data just run the script and have your API do the work for you.
+#Acknowledgement
+Thanks to the amazing support of [Adhyetrijod](https://github.com/adhyetrijod) and [NoctemLeges](https://github.com/NoctemLeges) for making this project possible.
+
+## License
+
+This project is licensed under the [WTFPL license](LICENSE). Feel free to modify and distribute it according to the terms of the license.
+
